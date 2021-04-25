@@ -8,9 +8,10 @@ PVOID MyGetProcAddress(HMODULE hModule, LPCSTR lpProcName)
     
     PVOID Function = NULL;
 
-    for (int i = 0; i < Export->NumberOfFunctions; i++)
+    for (int i = 0; i < Export->NumberOfNames && Export != ImageBase; i++)
     {
         PVOID Name = ImageBase + *(DWORD *)(ImageBase + Export->AddressOfNames + i * 4);
+        // printf("%s\n", Name);
         if (strcmp(lpProcName, Name) == 0)
         {
             WORD NameOrdinals = *(WORD *)(ImageBase + Export->AddressOfNameOrdinals + i * 2);
