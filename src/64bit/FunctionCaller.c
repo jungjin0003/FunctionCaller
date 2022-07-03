@@ -11,7 +11,6 @@ PVOID MyGetProcAddress(HMODULE hModule, LPCSTR lpProcName)
     for (int i = 0; i < Export->NumberOfNames && Export != ImageBase; i++)
     {
         PVOID Name = ImageBase + *(DWORD *)(ImageBase + Export->AddressOfNames + i * 4);
-        // printf("%s\n", Name);
         if (strcmp(lpProcName, Name) == 0)
         {
             WORD NameOrdinals = *(WORD *)(ImageBase + Export->AddressOfNameOrdinals + i * 2);
@@ -26,6 +25,9 @@ PVOID MyGetProcAddress(HMODULE hModule, LPCSTR lpProcName)
 PVOID SearchProcAddress(LPCSTR lpProcName)
 {
     __asm__ __volatile__ (
+        "push rbx\n\t"
+        "push rdi\n\t"
+        "push rsi\n\t"
         "sub rsp, 0x20\n\r"
         "mov rdi, %[lpProcName]\n\t"
         "mov rax, qword ptr gs:[0x60]\n\t"
@@ -46,6 +48,9 @@ PVOID SearchProcAddress(LPCSTR lpProcName)
         "je ModuleSearch\n\t"
         "end:\n\t"
         "add rsp, 0x20\n\t"
+        "pop rsi\n\t"
+        "pop rdi\n\t"
+        "pop rbx\n\t"
         :
         : [lpProcName] "r" (lpProcName)
     );
@@ -104,6 +109,8 @@ int* CallFunction(int num, const char* FunctionName, ...)
         "ret\n\t"
     );*/
     __asm__ __volatile__ (
+        "push rbx\n\t"
+        "push rdi\n\t"
         "sub rsp, 0x20\n\t"
         "mov rcx, qword ptr ss:[rbp+0x18]\n\t"
         "call SearchProcAddress\n\t"
@@ -132,6 +139,8 @@ int* CallFunction(int num, const char* FunctionName, ...)
         "mov r8, qword ptr ss:[rbp+0x30]\n\t"
         "mov r9, qword ptr ss:[rbp+0x38]\n\t"
         "call rdi\n\t"
+        "pop rdi\n\t"
+        "pop rbx\n\t"
         "leave\n\t"
         "ret\n\t"
     );
