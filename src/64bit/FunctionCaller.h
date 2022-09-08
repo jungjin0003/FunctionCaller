@@ -3,4 +3,8 @@
 #include <stdio.h>
 #include <windows.h>
 
-int* CallFunction(int num, const char* FunctionName, ...);
+#ifdef __GNUC__
+VOID* CallFunction(int num, const char* FunctionName, ...);
+#elif _MSC_VER
+extern VOID* CallFunction(int num, const char* FunctionName, ...);
+#endif
