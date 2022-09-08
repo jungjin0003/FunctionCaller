@@ -22,6 +22,7 @@ PVOID MyGetProcAddress(HMODULE hModule, LPCSTR lpProcName)
     return Function;
 }
 
+#ifdef __GNUC__
 PVOID SearchProcAddress(LPCSTR lpProcName)
 {
     __asm__ __volatile__ (
@@ -58,7 +59,7 @@ PVOID SearchProcAddress(LPCSTR lpProcName)
     return;
 }
 
-int* CallFunction(int num, const char* FunctionName, ...)
+VOID* CallFunction(int num, const char* FunctionName, ...)
 {
     /* __declspec(naked)
     __asm__ __volatile__ (
@@ -145,3 +146,4 @@ int* CallFunction(int num, const char* FunctionName, ...)
         "ret\n\t"
     );
 }
+#endif
